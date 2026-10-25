@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Бунташный век</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ruslan+Display&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+<style>
+:root{
+  --bg:#E7E6E0; --surface:#F4F3EE; --ink:#231F1C; --muted:#5E5850;
+  --red:#A8231A; --blue:#1F4A7A; --gold:#8E6A18; --line:#C7C4B9;
+  --display:'Ponomar','Old Standard TT','Palatino Linotype',Palatino,Georgia,serif;
+  --body:'PT Serif',Georgia,'Times New Roman',serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#131826; --surface:#1B2133; --ink:#E8E4DA; --muted:#A6A198;
+    --red:#E46A5C; --blue:#86AEDF; --gold:#D4AE55; --line:#303850;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131826; --surface:#1B2133; --ink:#E8E4DA; --muted:#A6A198;
+  --red:#E46A5C; --blue:#86AEDF; --gold:#D4AE55; --line:#303850;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.6}
+.wrap{max-width:34rem;margin:0 auto;padding:0 1.1rem 3rem}
+
+/* мерила */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar[hidden]{display:none}
+.bar-in{max-width:34rem;margin:0 auto;padding:.55rem 1.1rem;display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem}
+.stat{font-size:.82rem;line-height:1.2}
+.stat-top{display:flex;justify-content:space-between;align-items:baseline}
+.stat-num{font-weight:700;font-size:1rem;transition:color .4s}
+.stat.up .stat-num{color:var(--blue)}
+.stat.down .stat-num{color:var(--red)}
+.meter{display:block;height:4px;margin-top:.3rem;background:var(--line)}
+.meter i{display:block;height:100%;background:var(--gold);transition:width .5s ease}
+
+/* кремль */
+.kremlin{margin:1.1rem 0 0}
+.kremlin svg{display:block;width:100%;height:auto}
+.kremlin figcaption{font-size:.82rem;color:var(--muted);font-style:italic;margin-top:.3rem}
+
+/* сцена */
+.when{margin:1.4rem 0 0;color:var(--muted);font-size:.95rem}
+h1,h2{font-family:var(--display);font-weight:400;color:var(--red);line-height:1.15;margin:.2rem 0 .8rem}
+h1{font-size:2.7rem}
+h2{font-size:2rem}
+h1:focus,h2:focus{outline:none}
+p{margin:0 0 .9rem}
+.story p:first-child::first-letter{font-family:var(--display);color:var(--red);font-size:3.1em;line-height:.9;float:left;padding:.08em .1em 0 0}
+.choices{display:grid;gap:.6rem;margin-top:1.2rem}
+button{font:inherit;color:inherit;cursor:pointer}
+.choice{text-align:left;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--red);padding:.8rem .9rem;border-radius:2px;line-height:1.4}
+.choice:hover{border-color:var(--ink);border-left-color:var(--red)}
+.go{background:var(--red);color:#fff;border:0;padding:.8rem 1.2rem;border-radius:2px;margin-top:.6rem;font-weight:700}
+.go.ghost{background:none;color:var(--ink);border:1px solid var(--ink);font-weight:400;margin-left:.5rem}
+:root[data-theme="dark"] .go:not(.ghost){color:#131826}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .go:not(.ghost){color:#131826}}
+button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.picked{font-style:italic;color:var(--muted);border-left:3px solid var(--line);padding-left:.8rem;margin:1rem 0}
+.delta{display:flex;flex-wrap:wrap;gap:.4rem 1rem;font-size:.92rem;font-weight:700;margin:0 0 1rem}
+.delta .plus{color:var(--blue)}
+.delta .minus{color:var(--red)}
+.fact{border-left:3px solid var(--blue);padding:.1rem 0 .1rem .8rem;margin:1rem 0;font-size:.95rem}
+.fact b{display:block;color:var(--blue);font-size:.88rem}
+.verdict{font-size:.92rem;margin:0 0 .5rem}
+.verdict.same{color:var(--blue)}
+.verdict.other{color:var(--red)}
+.log{list-style:none;padding:0;margin:1.2rem 0;border-top:1px solid var(--line)}
+.log li{padding:.55rem 0;border-bottom:1px solid var(--line);font-size:.92rem;line-height:1.4}
+.log .yr{font-weight:700;margin-right:.4rem}
+.log .mk{display:block;font-size:.84rem}
+.log .mk.same{color:var(--blue)}
+.log .mk.other{color:var(--red)}
+.score{font-weight:700}
+#stage{animation:in .35s ease}
+@keyframes in{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){#stage{animation:none}.meter i,.stat-num{transition:none}}
+
+
+/* лак и золото */
+:root{--bg:#F1E6CC;--surface:#FBF4E2;--ink:#2B1B12;--muted:#6E5847;--line:#D3BF98;--accent:#A5281B;--red:#A5281B;--blue:#1F4E8C;--gold:#B2801A;--display:'Ruslan Display','Alegreya',Georgia,serif;--body:'Alegreya',Georgia,serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16110E;--surface:#221A15;--ink:#F3E8D2;--muted:#BBA98E;--line:#46362B;--accent:#EA5B43;--red:#F27D69;--blue:#82B4F2;--gold:#E6B450}}
+:root[data-theme="dark"]{--bg:#16110E;--surface:#221A15;--ink:#F3E8D2;--muted:#BBA98E;--line:#46362B;--accent:#EA5B43;--red:#F27D69;--blue:#82B4F2;--gold:#E6B450}
+body{font-size:20px;line-height:1.55;background:radial-gradient(ellipse at top,var(--surface),var(--bg) 75%) fixed}
+.wrap{background:var(--surface);border-inline:3px double var(--gold);padding-top:0}
+.wrap::before{content:"";display:block;height:9px;margin:0 -1.1rem .8rem;background:repeating-linear-gradient(90deg,var(--accent) 0 12px,var(--gold) 12px 24px)}
+h1,h2{font-family:var(--display);color:var(--accent);font-weight:400;letter-spacing:.01em}
+h1{font-size:3.1rem}
+.when{font-family:var(--display);color:var(--gold);letter-spacing:.04em}
+.story p:first-child::first-letter{color:var(--accent);font-size:3.4em}
+.bar{background:var(--surface);border-bottom:2px solid var(--gold)}
+.meter{height:9px;border:1px solid var(--gold);background:transparent;border-radius:2px}
+.meter i{background:linear-gradient(90deg,var(--accent),var(--gold))}
+.kremlin figcaption{text-align:center;font-style:normal;font-family:var(--display)}
+.choices{counter-reset:c}
+.choice{display:flex;gap:.9rem;align-items:center;background:var(--bg);border:1px solid var(--gold);border-left:1px solid var(--gold);border-radius:4px;padding:.8rem 1rem;box-shadow:3px 3px 0 var(--accent);transition:transform .15s,box-shadow .15s}
+.choice::before{counter-increment:c;content:counter(c);flex:none;width:1.9rem;height:1.9rem;border:2px solid var(--gold);border-radius:50%;color:var(--accent);font:400 1.1rem/1.65rem var(--display);text-align:center}
+.choice:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--accent);border-color:var(--gold)}
+.go{background:var(--accent);color:#fff;border:2px solid var(--gold);border-radius:4px;box-shadow:3px 3px 0 var(--gold);font-family:var(--display);font-weight:400;letter-spacing:.03em;padding:.7rem 1.4rem}
+:root[data-theme="dark"] .go:not(.ghost){color:#16110E}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .go:not(.ghost){color:#16110E}}
+.go.ghost{background:none;color:var(--ink);box-shadow:none}
+.fact{background:var(--bg);border:1px dashed var(--gold);border-left:4px solid var(--accent);padding:.7rem .9rem}
+.fact b{color:var(--accent);font-family:var(--display);font-weight:400;font-size:1rem}
+.score{font-family:var(--display);font-weight:400;color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="bar" id="bar" hidden><div class="bar-in" id="stats"></div></header>
+<div class="wrap">
+  <figure class="kremlin" id="kremlin"></figure>
+  <main id="stage" aria-live="polite"></main>
+</div>
+
+<script>
+const S=[
+{y:'1613',who:'Михаил Фёдорович',t:'Выбор всей земли',
+ p:['Москва освобождена, престол пуст. На Земском соборе съехались все сословия, и 21 февраля тебя, 16-летнего сына митрополита Филарета, провозгласили царём.','Ты с матерью, старицей Марфой, укрываешься в костромском Ипатьевском монастыре. Послы просят ехать в Москву.'],
+ c:[{l:'Принять посох из рук послов',ok:1,e:{a:3},r:'Ты со слезами отказывался, но послы сказали, что тебя выбрали «всею землёю», а отказ навлечёт «конечное разорение». Мать благословила тебя, и ты принял посох.'},
+    {l:'Отказаться: страна слишком разорена',e:{a:-3},r:'Престол остался пустым, споры о нём вспыхнули снова, а люди лишились надежды на мирную жизнь.'},
+    {l:'Ехать в Москву тайно, не дожидаясь послов',e:{a:-1,v:-1},r:'Польский отряд искал тебя в костромских лесах, дорога без охраны слишком опасна.'}],
+ h:'Собор 1613 г. исключил иноземных принцев и сына Марины Мнишек. Михаила выбрали за родство с угасшей династией (двоюродный племянник царя Фёдора Ивановича), за поддержку казаков и духовенства и за твёрдость его отца Филарета против планов Сигизмунда III. Иван Сусанин не выдал врагам, где укрылся царь, и был замучен.'},
+
+{y:'1613',who:'Михаил Фёдорович',t:'Власть и войско',
+ p:['Надо изгнать захватчиков и «унять воров», а для этого нужны войско и налоги. Но страна всё ещё в хаосе, в казне нет денег.','На чём построить власть?'],
+ c:[{l:'Решать «по царскому указу и земскому приговору» и созывать соборы для чрезвычайных налогов',ok:1,e:{a:2,k:1},r:'Соборы своими приговорами подкрепляли чрезвычайные налоги и военные походы. Царская власть признала, что без поддержки народа ей не обойтись.'},
+    {l:'Править вместе с одной Боярской думой',e:{a:-2,k:-1},r:'Провинция не чувствует себя участницей общего дела, налоги идут туго.'},
+    {l:'Собрать налоги силой, не спрашивая выборных',e:{k:2,a:-3},r:'Деньги нашлись, но разорённые посады и уезды ответили ропотом.'}],
+ h:'При Михаиле Фёдоровиче формула «по царскому указу и земскому приговору» несколько лет существовала рядом со старой: «царь приказал, и бояре приговорили».'},
+
+{y:'1617',who:'Михаил Фёдорович',t:'Мир любой ценой',
+ p:['Шведы взяли Новгород, но Псков устоял, и король Густав II Адольф отступил. В 1618 г. королевич Владислав подошёл к Москве, его поддерживают запорожцы. Ресурсов на две войны нет.'],
+ c:[{l:'Заключить мир со Швецией и перемирие с Польшей, уступив земли',ok:1,e:{v:1,a:1,k:-1},r:'В Столбове ты уступил шведам Ивангород, Ям, Копорье и Орешек, но вернул Новгород, Старую Руссу, Ладогу. Москва отбила штурм, а в Деулине подписано перемирие на 14,5 лет. Смоленск остался у Польши.'},
+    {l:'Воевать с обоими противниками до победы',e:{v:-3,k:-2},r:'Сил хватило на оборону, но не на возвращение потерянного. Войско и казна иссякли.'},
+    {l:'Признать права Владислава на престол ради мира',e:{a:-4},r:'Земля выбирала тебя вопреки иноземным претендентам. Уступка подорвала доверие к твоей власти.'}],
+ h:'По Столбовскому миру 1617 г. Россия вновь потеряла выход к Балтийскому морю. Деулинское перемирие 1618 г. завершило Смуту, но Владислав не отказался от прав на московский престол.'},
+
+{y:'1632',who:'Михаил Фёдорович',t:'Смоленская война',
+ p:['Главная задача внешней политики: вернуть земли, потерянные в Смуту. Армия подготовлена, её возглавляет боярин Михаил Шеин, прославленный защитник Смоленска.'],
+ c:[{l:'Начать войну и осадить Смоленск',ok:1,e:{v:-2,k:-1,a:-1},r:'Король Владислав IV заблокировал лагерь Шеина, начались голод и болезни. Польские посланцы подкупили крымского хана, служилые люди бросились спасать свои владения: «Рать твоя, государь, разбежалась». В феврале 1634 г. Шеин сдался.'},
+    {l:'Сначала обезопасить юг и договориться с Крымом',e:{v:1,k:-1,a:1},r:'Крымский набег не отвлёк бы войско. Но возвращение Смоленска придётся отложить.'},
+    {l:'Отказаться от возвращения утраченных земель',e:{a:-2,k:1},r:'Казна цела, но люди видят, что царь смирился с потерей Смоленска.'}],
+ h:'Поляновский мир 1634 г.: за Речью Посполитой остались занятые в Смуту территории, зато Владислав отказался от прав на российский престол. Шеина казнили как изменника. После войны начали строить новые засечные черты.'},
+
+{y:'1648',who:'Алексей Михайлович',t:'Соляной бунт',
+ p:['В 1645 г. умер отец, и тебе, 16-летнему, помогает править дядька, боярин Борис Морозов. Он ввёл налог на соль, отменил его, но потребовал недоимки за прошлые годы.','Летом Москва восстала. Толпа убила начальника Земского приказа Плещеева и требует выдать Морозова. Стрельцы на стороне восставших.'],
+ c:[{l:'Выйти к народу с иконой и вымолить жизнь Морозова, а его удалить',ok:1,e:{a:2},r:'Ты «вымолил» жизнь боярина с условием, что он навсегда покинет столицу. В начале июня Морозов выехал в Кирилло-Белозерский монастырь.'},
+    {l:'Разогнать мятежников силой',e:{v:-3,a:-3},r:'Стрельцы поддерживали восставших, силы не нашлось. Мятеж только разросся.'},
+    {l:'Выдать Морозова на расправу',e:{a:1,k:-1},r:'Толпа получила жертву, но власть показала слабость.'}],
+ h:'Причины бунта: налог на соль 1646 г., возврат прямых налогов с недоимками, сокращение жалованья служилым и приказным. Бунт потряс царя: он стал сам заниматься делами, а к стрельцам с тех пор относился с заботой.'},
+
+{y:'1649',who:'Алексей Михайлович',t:'Соборное уложение',
+ p:['Бунт напугал власть. Нужен новый свод законов. Помещики мечтают бессрочно возвращать беглых крестьян, посадские люди хотят монополии на торговлю и закрепления горожан за посадами.'],
+ c:[{l:'Созвать Земский собор и составить Уложение вместе с выборными',ok:1,e:{a:1,k:2},r:'Около 300 выборных, большинство от дворян и провинциальных городов, обсуждали статьи. Урочные лета отменены, крестьяне прикреплены к земле, белые слободы упразднены, число тяглых дворов выросло на четверть.'},
+    {l:'Править по старым законам',e:{a:-3,k:-1},r:'Приказные продолжали злоупотреблять, недовольство росло.'},
+    {l:'Принять новые законы указом, без выборных',e:{a:-1,k:1},r:'Помещики и посадские не получили желаемого, а царь лишился опоры в провинции.'}],
+ h:'Соборное уложение 1649 г. готовил Уложенный приказ князя Никиты Одоевского. Оно действовало до 30-х гг. XIX в. и стало законодательной основой самодержавного строя. Право стало доступным для спорящих сторон, а злоупотреблений приказных поубавилось.'},
+
+{y:'1654',who:'Алексей Михайлович',t:'Малороссия',
+ p:['Гетман Богдан Хмельницкий воюет с Польшей, но после поражения под Берестечком просит принять Войско Запорожское в подданство. Это означает войну с Речью Посполитой, а память о Смоленске свежа.'],
+ c:[{l:'Принять Войско Запорожское «под высокую руку» по решению Земского собора',ok:1,e:{v:1,a:2,k:-2},r:'В октябре 1653 г. собор поддержал решение, в январе 1654 г. Переяславская рада присягнула тебе. Началась Русско-польская война: освобождены Смоленск и Новгород-Северская земля, пал Вильно.'},
+    {l:'Отказать, ограничившись открытием границ для беженцев',e:{a:-2,k:1},r:'Хмельницкий потерял надежду на Москву, а православное население Малой России осталось один на один с Польшей.'},
+    {l:'Посоветовать гетману искать союза с крымским ханом',e:{v:-1,a:-2},r:'Хан ненадёжен: под Берестечком он уже изменил казакам.'}],
+ h:'Права и вольности Войска Запорожского подтвердили, оно получило широкую автономию. После взятия Вильно в 1655 г. царь стал именоваться царём Великой, Малой и Белой Руси.'},
+
+{y:'1658',who:'Алексей Михайлович',t:'Никон',
+ p:['Патриарх Никон, твой «собинный друг», уверен, что «священство царства преболе есть», и хочет участвовать в управлении. Он исправил книги и обряды по греческим образцам, противники во главе с протопопом Аввакумом обвиняют его в порче веры.','В 1658 г. Никон, обидевшись, ушёл в Новоиерусалимский монастырь.'],
+ c:[{l:'Не удерживать Никона и судить его на церковном соборе',ok:1,e:{a:-1,k:-1},r:'В 1666–1667 гг. Большой Московский собор с восточными патриархами осудил Никона и сослал в Ферапонтов монастырь. Тот же собор предал старообрядцев анафеме, и раскол вышел за стены церкви.'},
+    {l:'Вернуть Никона к власти',e:{a:-3,k:-1},r:'Бояре, которых он раздражал, потеряли к тебе доверие, а спор «священства» и «царства» только обострился.'},
+    {l:'Отменить церковную реформу ради мира с её противниками',e:{a:1,v:-1},r:'Часть недовольных успокоилась, но контакты с православным миром, ради которых начиналась реформа, ослабели.'}],
+ h:'Собор 1666–1667 гг. постановил: патриарх должен быть послушен царю. Осада Соловецкого монастыря длилась с 1668 по 1676 г. Масштабных религиозных войн, как в Европе, в России не произошло.'},
+
+{y:'1662',who:'Алексей Михайлович',t:'Медные деньги',
+ p:['Долгая война с Польшей опустошила казну. Собственного серебра нет, монету чеканят из немецких иоахимсталеров. Нужны новые деньги.'],
+ c:[{l:'Чеканить медную монету по курсу серебряной, а налоги брать серебром',ok:1,e:{k:2,a:-3},r:'Доверие к деньгам рухнуло. В июле 1662 г. москвичи двинулись в Коломенское. Тебе поверили, но потом стрельцы и служилые иноземцы стали избивать безоружных. Пострадало около 7 тыс. человек, медные деньги отменили.'},
+    {l:'Взять деньги у богатых монастырей и купцов',e:{k:2,a:-1},r:'Обители и купцы недовольны, но деньги нашлись, а монета осталась серебряной.'},
+    {l:'Сократить расходы на войско и засеки',e:{k:1,v:-3},r:'Деньги сберегли, но армия ослабла посреди войны.'}],
+ h:'Медный бунт 1662 г. возник из-за денежной реформы. Арестованным выжигали на щеке букву «Б» («бунтовщик»).'},
+
+{y:'1667',who:'Алексей Михайлович',t:'Андрусово',
+ p:['Война с Польшей идёт с переменным успехом: поражения под Конотопом и Чудново, бегство польского короля от Глухова. Силы на исходе, а на Правобережье мятежничает гетман Дорошенко.'],
+ c:[{l:'Заключить Андрусовское перемирие, поручив переговоры Ордину-Нащокину',ok:1,e:{v:1,a:2,k:1},r:'Польша признала права России на Левобережье Днепра, Смоленские и Чернигово-Северские земли. Киев остался за Россией, а Ордин-Нащокин стал ближним боярином.'},
+    {l:'Продолжать войну за всю Малороссию',e:{v:-2,k:-2},r:'Ресурсы подходили к концу, а Крым и Турция ждали своего часа.'},
+    {l:'Вернуть Киев Польше ради скорого мира',e:{a:-2,k:1},r:'Киев — важнейший православный центр. Уступка вызвала возмущение в Малороссии.'}],
+ h:'Андрусовское перемирие января 1667 г. стало вехой: Россия ощутила, что может противостоять Польше. Запорожскую Сечь отдали под управление обоих монархов.'},
+
+{y:'1670',who:'Алексей Михайлович',t:'Разин',
+ p:['Донской атаман Степан Разин после похода «за зипунами» вернулся на Волгу. Он зовёт всех «обиженных» против «неправедных воевод и приказных», берёт Царицын и Астрахань, Саратов и Самару, осаждает Симбирск. К нему идут крестьяне, посадские, народы Поволжья.'],
+ c:[{l:'Собрать лучшие силы и призвать служилых встать «за великого государя»',ok:1,e:{v:2,a:-1,k:-1},r:'Под Москвой собралось до 60 тыс. конницы, стрельцы и полки нового строя. Барятинский разбил разинцев под Симбирском, домовитые казаки выдали Разина, и летом 1671 г. его казнили в Москве.'},
+    {l:'Отменить закрепощение, чтобы успокоить крестьян',e:{a:2,k:-2},r:'Помещики возмущены отменой Уложения, и ты теряешь их поддержку.'},
+    {l:'Ждать, пока мятеж сам утихнет',e:{a:-3,v:-2},r:'Восстание растёт и грозит перерасти в новую смуту.'}],
+ h:'Это самое крупное выступление «бунташного века», историки называют его крестьянской войной. Крепостное право не пало, но страх перед новой разинщиной заставил власти быть осмотрительнее с крестьянами. Астрахань взяли в ноябре 1671 г.'}
+];
+
+const ENDS={
+ win:{t:'Мир без бунтов',x:'Ты провёл страну через эпоху без большой смуты: подданные тебе верили, казна и войско выдержали все войны. В реальности XVII век стал «бунташным» из-за восстаний, раскола и усиления крепостничества.'},
+ part:{t:'Бунташный век',x:'Ты правил, как цари Романовы. Россия вернула Смоленск, Левобережье Днепра и Киев, укрепилось самодержавие, а Соборное уложение на два столетия стало основой законов. Но цена высока: закрепощение крестьян, церковный раскол и череда восстаний.'},
+ razor:{t:'Казна пуста',x:'Платить воинам, приказным и стрельцам нечем. Начинаются новые поборы и бунты, как при Морозове.'},
+ vragi:{t:'Войско разбито',x:'Армии больше нет. Польша и Швеция снова на русской земле, как в годы Смуты.'},
+ neglavn:{t:'Доверие потеряно',x:'Города, служилые люди и казаки больше не верят царю. Страна вновь на грани смуты.'}
+};
+const NAMES={k:'Казна',v:'Войско',a:'Доверие'};
+const CAPS=['','','','Москва, XVI век'];
+const KEY='buntashny-vek-v1';
+let st, prev={k:3,v:3,a:4};
+const $=id=>document.getElementById(id);
+const fresh=()=>({i:0,k:3,v:3,a:4,log:[]});
+const cl=n=>Math.max(0,Math.min(10,n));
+function mix(n){const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&typeof s.i==='number'&&s.i<S.length&&Array.isArray(s.log))return s}catch(e){}return null}
+function wipe(){try{localStorage.removeItem(KEY)}catch(e){}}
+
+function kremlin(d){
+  const n=S.length,b=Math.max(0,Math.min(n,d+1)),w=360/n,cs=['var(--gold)','var(--accent)','var(--blue)'];let o='';
+  for(let k=0;k<n;k++){const x=k*w+w/2,f=k<b,h=12+((k*7)%4)*5,y=82-h,r=w*.38;
+    const s=f?`fill="${cs[k%3]}" stroke="var(--ink)"`:'fill="none" stroke="var(--muted)" stroke-dasharray="3 3"';
+    o+=`<rect x="${x-r*.6}" y="${y}" width="${r*1.2}" height="${h}" ${s}/><path d="M${x-r} ${y}C${x-r*1.5} ${y-14} ${x-3} ${y-14} ${x} ${y-30}C${x+3} ${y-14} ${x+r*1.5} ${y-14} ${x+r} ${y}Z" ${s}/><path d="M${x} ${y-30}v-8M${x-3} ${y-35}h6" stroke="${f?'var(--gold)':'var(--muted)'}" stroke-width="1.5" fill="none"/>`}
+  o+='<rect x="0" y="82" width="360" height="5" fill="var(--line)"/>';
+  const cap=b===0?'Россия после Смуты':b>=n?'Путь пройден':`${S[b-1].y} год: пройдено ${b} из ${n}`;
+  $('kremlin').innerHTML=`<svg viewBox="0 0 360 92" role="img" aria-label="${cap}">${o}</svg><figcaption>${cap}</figcaption>`;
+}
+
+function stats(){
+  $('stats').innerHTML=['k','v','a'].map(n=>{
+    const d=st[n]-prev[n];
+    return `<div class="stat${d>0?' up':d<0?' down':''}"><span class="stat-top"><span>${NAMES[n]}</span><span class="stat-num">${st[n]}</span></span><span class="meter"><i style="width:${st[n]*10}%"></i></span></div>`}).join('');
+  prev={k:st.k,v:st.v,a:st.a};
+}
+function show(html,bar){
+  $('bar').hidden=!bar;
+  const el=$('stage');el.innerHTML=html;
+  el.style.animation='none';void el.offsetWidth;el.style.animation='';
+  window.scrollTo(0,0);
+  const h=el.querySelector('h1,h2');if(h){h.tabIndex=-1;h.focus({preventScroll:true})}
+}
+
+function start(){
+  kremlin(-1);
+  const s=load();
+  show(`<h1>Бунташный век</h1>
+  <div class="story"><p>Новелла о двух царствованиях: Михаил Фёдорович и Алексей Михайлович, 1613–1671 годы.</p>
+  <p>Ты царь из династии Романовых. Страна едва пережила Смуту, а впереди войны, налоги и «бунташный век».</p>
+  <p>Следи за казной, войском и доверием подданных. Если любая шкала упадёт до нуля, правление закончится. После каждого решения узнаешь, как было на самом деле.</p></div>
+  <button class="go" id="new">Начать правление</button>${s&&s.i>0?`<button class="go ghost" id="cont">Продолжить с ${S[s.i].y} года</button>`:''}`,false);
+  $('new').onclick=()=>{st=fresh();prev={k:3,v:3,a:4};wipe();scene()};
+  if($('cont'))$('cont').onclick=()=>{st=s;prev={k:s.k,v:s.v,a:s.a};scene()};
+}
+
+function scene(){
+  const s=S[st.i];save();kremlin(st.i-1);stats();
+  show(`<p class="when">${s.y} год. ${s.who}</p><h2>${s.t}</h2>
+  <div class="story">${s.p.map(x=>`<p>${x}</p>`).join('')}</div>
+  <div class="choices">${mix(s.c.length).map(i=>`<button class="choice" data-i="${i}">${s.c[i].l}</button>`).join('')}</div>`,true);
+  document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>choose(+b.dataset.i));
+}
+
+function choose(i){
+  const s=S[st.i],c=s.c[i],e=c.e||{};
+  ['k','v','a'].forEach(n=>{if(e[n])st[n]=cl(st[n]+e[n])});
+  st.log.push({y:s.y,t:s.t,l:c.l,ok:!!c.ok});
+  const end=c.end||(st.v<=0?'vragi':st.k<=0?'razor':st.a<=0?'neglavn':null);
+  const last=st.i===S.length-1;
+  stats();
+  const dl=['k','v','a'].filter(n=>e[n]).map(n=>`<span class="${e[n]>0?'plus':'minus'}">${NAMES[n]} ${e[n]>0?'+':'−'}${Math.abs(e[n])}</span>`).join('');
+  show(`<p class="when">${s.y} год. ${s.who}</p><h2>${s.t}</h2>
+  <p class="picked">${c.l}</p>
+  <p>${c.r}</p>
+  ${dl?`<p class="delta">${dl}</p>`:''}
+  <p class="verdict ${c.ok?'same':'other'}">${c.ok?'Так было и в истории.':'В истории царь поступил иначе.'}</p>
+  <div class="fact"><b>Как было на самом деле</b>${s.h}</div>
+  <button class="go" id="next">${end?'Узнать, чем всё кончилось':last?'Подвести итог':'Дальше'}</button>`,true);
+  $('next').onclick=()=>{
+    if(end)return finish(end,c.et);
+    if(last){const n=st.log.filter(x=>x.ok).length;return finish(st.a>=8&&st.v>=6&&st.k>=2?'win':'part')}
+    st.i++;scene();
+  };
+}
+
+function finish(key,custom){
+  const E=ENDS[key],n=st.log.filter(x=>x.ok).length,tot=st.log.length,y=S[st.i].y;
+  wipe();kremlin(key==='win'||key==='part'?S.length:st.i-1);
+  show(`<p class="when">${key==='win'||key==='part'?'Итог правления':'Правление оборвалось в '+y+' году'}</p><h2>${E.t}</h2>
+  <div class="story">${custom?`<p>${custom}</p>`:''}<p>${E.x}</p></div>
+  <p class="score">Решений, совпавших с историей: ${n} из ${tot}. Всего в игре ${S.length}.</p>
+  <ul class="log">${st.log.map(x=>`<li><span class="yr">${x.y}</span>${x.l}<span class="mk ${x.ok?'same':'other'}">${x.ok?'как в истории':'иначе, чем в истории'}</span></li>`).join('')}</ul>
+  <button class="go" id="again">Начать заново</button>`,true);
+  $('again').onclick=start;
+}
+
+start();
+</script>
+</body>
+</html>
